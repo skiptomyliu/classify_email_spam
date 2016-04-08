@@ -49,7 +49,7 @@ email_contents = regexprep(email_contents, '[$]+', 'dollar');
 % ========================== Tokenize Email ===========================
 
 % Output the email to screen as well
-fprintf('\n==== Processed Email ====\n\n');
+% fprintf('\n==== Processed Email ====\n\n');
 
 % Process file
 l = 0;
@@ -97,28 +97,34 @@ while ~isempty(email_contents)
     %       str2). It will return 1 only if the two strings are equivalent.
     %
 
+    try
+        word_indices = [word_indices, vocab_struct.(str)]
+    catch
+    end_try_catch
 
-    for idx = 1:length(vocabList)
-        if strcmp(vocabList{idx},str)
-            word_indices = [word_indices, idx];
-        endif
-    endfor
+
+
+    % for idx = 1:length(vocabList)
+    %     if strcmp(vocabList{idx},str)
+    %         word_indices = [word_indices, idx];
+    %     endif
+    % endfor
 
 
     % =============================================================
 
 
     % Print to screen, ensuring that the output lines are not too long
-    if (l + length(str) + 1) > 78
-        fprintf('\n');
-        l = 0;
-    end
-    fprintf('%s ', str);
-    l = l + length(str) + 1;
+    % if (l + length(str) + 1) > 78
+    %     fprintf('\n');
+    %     l = 0;
+    % end
+    % fprintf('%s ', str);
+    % l = l + length(str) + 1;
 
 end
 
 % Print footer
-fprintf('\n\n=========================\n');
+% fprintf('\n\n=========================\n');
 
 end
