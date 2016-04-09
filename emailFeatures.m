@@ -8,7 +8,7 @@ function x = emailFeatures(word_indices)
 n = 1899;
 
 % You need to return the following variables correctly.
-x = zeros(n, 1);
+x = zeros(1, n);
 
 % ====================== YOUR CODE HERE ======================
 % Instructions: Fill in this function to return a feature vector for the
@@ -51,11 +51,6 @@ x = zeros(n, 1);
 for idx = 1:length(word_indices)
     x(word_indices) = 1;
 endfor
-
-
-
-
-
 
 % =========================================================================
     

@@ -1,13 +1,10 @@
-function word_indices = processEmail(email_contents)
+function word_indices = processEmail(email_contents, vocabStruct)
 %PROCESSEMAIL preprocesses a the body of an email and
 %returns a list of word_indices 
 %   word_indices = PROCESSEMAIL(email_contents) preprocesses 
 %   the body of an email and returns a list of indices of the 
 %   words contained in the email. 
 %
-
-% Load Vocabulary
-vocabList = getVocabList();
 
 % Init return value
 word_indices = [];
@@ -45,7 +42,6 @@ email_contents = regexprep(email_contents, '[^\s]+@[^\s]+', 'emailaddr');
 % Handle $ sign
 email_contents = regexprep(email_contents, '[$]+', 'dollar');
 
-
 % ========================== Tokenize Email ===========================
 
 % Output the email to screen as well
@@ -53,15 +49,10 @@ email_contents = regexprep(email_contents, '[$]+', 'dollar');
 
 % Process file
 l = 0;
+email_list = strsplit(email_contents);
 
-while ~isempty(email_contents)
-
-    % Tokenize and also get rid of any punctuation
-    [str, email_contents] = ...
-       strtok(email_contents, ...
-              [' @$/#.-:&*+=[]?!(){},''">_<;%' char(10) char(13)]);
-   
-    % Remove any non alphanumeric characters
+for i = 1:length(strsplit(email_contents))
+    str = email_list{i};
     str = regexprep(str, '[^a-zA-Z0-9]', '');
 
     % Stem the word 
@@ -70,61 +61,87 @@ while ~isempty(email_contents)
     catch str = ''; continue;
     end;
 
-    % Skip the word if it is too short
+    % Skip the word if it is too short, or porter returns blank
     if length(str) < 1
        continue;
     end
-
-    % Look up the word in the dictionary and add to word_indices if
-    % found
-    % ====================== YOUR CODE HERE ======================
-    % Instructions: Fill in this function to add the index of str to
-    %               word_indices if it is in the vocabulary. At this point
-    %               of the code, you have a stemmed word from the email in
-    %               the variable str. You should look up str in the
-    %               vocabulary list (vocabList). If a match exists, you
-    %               should add the index of the word to the word_indices
-    %               vector. Concretely, if str = 'action', then you should
-    %               look up the vocabulary list to find where in vocabList
-    %               'action' appears. For example, if vocabList{18} =
-    %               'action', then, you should add 18 to the word_indices 
-    %               vector (e.g., word_indices = [word_indices ; 18]; ).
-    % 
-    % Note: vocabList{idx} returns a the word with index idx in the
-    %       vocabulary list.
-    % 
-    % Note: You can use strcmp(str1, str2) to compare two strings (str1 and
-    %       str2). It will return 1 only if the two strings are equivalent.
-    %
-
+    % Try and catch since there are potential words that are not found in 
+    % the vocabStruct lookup. 
     try
-        word_indices = [word_indices, vocab_struct.(str)]
+        word_indices = [word_indices, vocabStruct.(str)];
     catch
+        str;
     end_try_catch
+endfor
+% word_indices
 
 
 
-    % for idx = 1:length(vocabList)
-    %     if strcmp(vocabList{idx},str)
-    %         word_indices = [word_indices, idx];
-    %     endif
-    % endfor
+% OLD CODE:
+% while ~isempty(email_contents)
+%     % Tokenize and also get rid of any punctuation
+
+%     [str, email_contents] = ...
+%        strtok(email_contents, ...
+%               [' @$/#.-:&*+=[]?!(){},''">_<;%' char(10) char(13)]);
+%     % Remove any non alphanumeric characters
+%     str = regexprep(str, '[^a-zA-Z0-9]', '');
+
+%     % Stem the word 
+%     % (the porterStemmer sometimes has issues, so we use a try catch block)
+%     try str = porterStemmer(strtrim(str)); 
+%     catch str = ''; continue;
+%     end;
+
+%     % Skip the word if it is too short, or porter returns blank
+%     if length(str) < 1
+%        continue;
+%     end
+
+%     % Look up the word in the dictionary and add to word_indices if
+%     % found
+%     % ====================== YOUR CODE HERE ======================
+%     % Instructions: Fill in this function to add the index of str to
+%     %               word_indices if it is in the vocabulary. At this point
+%     %               of the code, you have a stemmed word from the email in
+%     %               the variable str. You should look up str in the
+%     %               vocabulary list (vocabList). If a match exists, you
+%     %               should add the index of the word to the word_indices
+%     %               vector. Concretely, if str = 'action', then you should
+%     %               look up the vocabulary list to find where in vocabList
+%     %               'action' appears. For example, if vocabList{18} =
+%     %               'action', then, you should add 18 to the word_indices 
+%     %               vector (e.g., word_indices = [word_indices ; 18]; ).
+%     % 
+%     % Note: vocabList{idx} returns a the word with index idx in the
+%     %       vocabulary list.
+%     % 
+%     % Note: You can use strcmp(str1, str2) to compare two strings (str1 and
+%     %       str2). It will return 1 only if the two strings are equivalent.
+%     %
+
+%     % Try and catch since there are potential words that are not found in 
+%     % the vocabStruct lookup.  
+%     try
+%         word_indices = [word_indices, vocabStruct.(str)];
+%     catch
+%     end_try_catch
+
+% end
 
 
-    % =============================================================
+
+%     % =============================================================
 
 
-    % Print to screen, ensuring that the output lines are not too long
-    % if (l + length(str) + 1) > 78
-    %     fprintf('\n');
-    %     l = 0;
-    % end
-    % fprintf('%s ', str);
-    % l = l + length(str) + 1;
+%     % Print to screen, ensuring that the output lines are not too long
+%     % if (l + length(str) + 1) > 78
+%     %     fprintf('\n');
+%     %     l = 0;
+%     % end
+%     % fprintf('%s ', str);
+%     % l = l + length(str) + 1;
 
-end
-
-% Print footer
-% fprintf('\n\n=========================\n');
+% end % end while
 
 end
