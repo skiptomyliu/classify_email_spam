@@ -1,58 +1,17 @@
-%% Machine Learning Online Class
-%  Exercise 6 | Spam Classification with SVMs
-%
-%  Instructions
-%  ------------
-% 
-%  This file contains code that helps you get started on the
-%  exercise. You will need to complete the following functions:
-%
-%     gaussianKernel.m
-%     dataset3Params.m
-%     processEmail.m
-%     emailFeatures.m
-%
-%  For this exercise, you will not need to change any code in this file,
-%  or any other files other than those mentioned above.
-%
-
+%% Extension of Coursera's Machine Learning Support Vector Machine
+%%
+%% Additions:
+%% - create_training_samples.m creates our own training and cross validation
+%%	 	samples from spamhaus
+%% - Small changes to getVocab to return both struct and list for 
+%%   	improvements in performance
 %% Initialization
 clear ; close all; clc
 
-%% ==================== Part 1: Email Preprocessing ====================
-%  To use an SVM to classify emails into Spam v.s. Non-Spam, you first need
-%  to convert each email into a vector of features. In this part, you will
-%  implement the preprocessing steps for each email. You should
-%  complete the code in processEmail.m to produce a word indices vector
-%  for a given email.
+% Load training sample and cross validation tests
+% Load into X, y
+load('trainingSamples.mat') 
 
-% Extract Features
-
-[X_s,y_s] = trainEmail('scrubbed_spam', 1);
-[X_h,y_h] = trainEmail('scrubbed_ham', 0);
-X = [X_s; X_h];
-y = [y_s; y_h];
-
-% Save the training samples:
-save('trainingSamples.mat', 'X','y');
-% fprintf('Program paused. Press enter to continue.\n');
-% pause;
-
-% %% =========== Part 3: Train Linear SVM for Spam Classification ========
-% %  In this section, you will train a linear classifier to determine if an
-% %  email is Spam or Not-Spam.
-
-% % Load the Spam Email dataset
-% % You will have X, y in your environment
-% load('spamTrain.mat');
-
-% fprintf('\nTraining Linear SVM (Spam Classification)\n')
-% fprintf('(this may take 1 to 2 minutes) ...\n')
-
-
-% % My notes:
-% % X is 4000 entries of emails, with 1899 features.  
-% % y is output of whether the amil is spam or not
 C = 0.1;
 model = svmTrain(X, y, C, @linearKernel);
 
@@ -60,22 +19,13 @@ p = svmPredict(model, X);
 fprintf('Training Accuracy: %f\n', mean(double(p == y)) * 100);
 
 
-%% XXX: TODO Test Spam Classification
-% %% =================== Part 4: Test Spam Classification ================
-% %  After training the classifier, we can evaluate it on a test set. We have
-% %  included a test set in spamTest.mat
-
-% % Load the test dataset
-% % You will have Xtest, ytest in your environment
-% load('spamTest.mat');
-
-% fprintf('\nEvaluating the trained Linear SVM on a test set ...\n')
-
-% p = svmPredict(model, Xtest);
-
-% fprintf('Test Accuracy: %f\n', mean(double(p == ytest)) * 100);
+% Test against cross validation 
+% Load into Xtest, ytest 
+load('trainingTests.mat')
+fprintf('\nEvaluating the trained Linear SVM on a test set ...\n')
+p = svmPredict(model, Xtest);
+fprintf('Test Accuracy: %f\n', mean(double(p == ytest)) * 100);
 % pause;
-
 
 % %% ================= Part 5: Top Predictors of Spam ====================
 % %  Since the model we are training is a linear SVM, we can inspect the
@@ -84,7 +34,6 @@ fprintf('Training Accuracy: %f\n', mean(double(p == y)) * 100);
 % %  the highest weights in the classifier. Informally, the classifier
 % %  'thinks' that these words are the most likely indicators of spam.
 % %
-
 % % Sort the weights and obtain the vocabulary list
 [weight, idx] = sort(model.w, 'descend');
 
@@ -94,23 +43,7 @@ fprintf('\nTop predictors of spam: \n');
 for i = 1:15
     fprintf(' %-15s (%f) \n', vocabList{idx(i)}, weight(i));
 end
-
-% fprintf('\n\n');
-% fprintf('\nProgram paused. Press enter to continue.\n');
-% pause;
-
 % %% =================== Part 6: Try Your Own Emails =====================
-% %  Now that you've trained the spam classifier, you can use it on your own
-% %  emails! In the starter code, we have included spamSample1.txt,
-% %  spamSample2.txt, emailSample1.txt and emailSample2.txt as examples. 
-% %  The following code reads in one of these emails and then uses your 
-% %  learned SVM classifier to determine whether the email is Spam or 
-% %  Not Spam
-
-% % Set the file to be read in (change this to spamSample2.txt,
-% % emailSample1.txt or emailSample2.txt to see different predictions on
-% % different emails types). Try your own emails as well!
-
 
 % % Read and predict
 filename = 'spamSample1.txt';
